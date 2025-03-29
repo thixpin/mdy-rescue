@@ -9,7 +9,7 @@ trait HasShortId
     protected static function bootHasShortId()
     {
         static::creating(function ($model) {
-            if (!$model->short_id) {
+            if (! $model->short_id) {
                 $model->short_id = static::generateShortId();
             }
         });
@@ -17,9 +17,9 @@ trait HasShortId
 
     protected static function generateShortId()
     {
-        $client = new Client();
+        $client = new Client;
         $alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        
+
         do {
             // Generate a 10-character ID using only alphanumeric characters
             $shortId = $client->formattedId($alphabet, 10);
@@ -32,4 +32,4 @@ trait HasShortId
     {
         return 'short_id';
     }
-} 
+}

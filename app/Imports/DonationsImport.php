@@ -3,18 +3,16 @@
 namespace App\Imports;
 
 use App\Models\Donation;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
-use Carbon\Carbon;
 
 class DonationsImport implements ToModel, WithHeadingRow, WithValidation
 {
     /**
-    * @param array $row
-    *
-    * @return \Illuminate\Database\Eloquent\Model|null
-    */
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
     public function model(array $row)
     {
         try {
@@ -38,7 +36,7 @@ class DonationsImport implements ToModel, WithHeadingRow, WithValidation
                 'certificate_url' => $row['certificate_url'] ?? null,
             ]);
         } catch (\Exception $e) {
-            throw new \Exception("Error processing row: " . json_encode($row) . ". Error: " . $e->getMessage());
+            throw new \Exception('Error processing row: '.json_encode($row).'. Error: '.$e->getMessage());
         }
     }
 

@@ -20,15 +20,16 @@ class CertificateController extends Controller
         $shortId = strtoupper($request->input('short_id'));
         $donation = Donation::where('short_id', $shortId)->first();
 
-        if (!$donation) {
+        if (! $donation) {
             return response()->json([
                 'success' => false,
-                'message' => 'Certificate not found'
+                'message' => 'Certificate not found',
             ], 404);
         }
 
         try {
             $isValid = $this->certificateService->verifyCertificate($donation);
+
             return response()->json([
                 'success' => true,
                 'is_valid' => $isValid,
@@ -39,13 +40,13 @@ class CertificateController extends Controller
                     'donation_amount' => $donation->donation_amount,
                     'donate_date' => $donation->donate_date->format('Y-m-d'),
                     'certificate_url' => $donation->certificate_url,
-                    'short_id' => $donation->short_id
-                ]
+                    'short_id' => $donation->short_id,
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to verify certificate: ' . $e->getMessage()
+                'message' => 'Failed to verify certificate: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -53,6 +54,7 @@ class CertificateController extends Controller
     public function showVerificationPage()
     {
         $shortId = request()->get('id');
+
         return view('certificates.verify', compact('shortId'));
     }
-} 
+}

@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Donation;
 use App\Imports\DonationsImport;
-use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Donation;
 use App\Services\CertificateService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DonationController extends Controller
 {
@@ -22,6 +22,7 @@ class DonationController extends Controller
     public function index()
     {
         $donations = Donation::latest()->paginate(10);
+
         return view('admin.donations.index', compact('donations'));
     }
 
@@ -47,6 +48,7 @@ class DonationController extends Controller
         if (request()->ajax()) {
             return response()->json($donation);
         }
+
         return view('admin.donations.edit', compact('donation'));
     }
 
@@ -77,19 +79,21 @@ class DonationController extends Controller
 
     public function toggleVerification(Donation $donation)
     {
-        $newVerifiedStatus = !$donation->verified;
+        $newVerifiedStatus = ! $donation->verified;
         $donation->update(['verified' => $newVerifiedStatus]);
 
         // Generate certificate when verifying
         if ($newVerifiedStatus) {
             try {
                 $this->certificateService->generateAndUploadCertificate($donation);
+
                 return redirect()->route('admin.donations.index')
                     ->with('success', 'Donation verified and certificate generated successfully.');
             } catch (\Exception $e) {
-                Log::error('Failed to generate certificate for donation ' . $donation->id . ': ' . $e->getMessage());
+                Log::error('Failed to generate certificate for donation '.$donation->id.': '.$e->getMessage());
+
                 return redirect()->route('admin.donations.index')
-                    ->with('error', 'Donation verified but failed to generate certificate: ' . $e->getMessage());
+                    ->with('error', 'Donation verified but failed to generate certificate: '.$e->getMessage());
             }
         }
 
@@ -100,7 +104,7 @@ class DonationController extends Controller
     public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv'
+            'file' => 'required|mimes:xlsx,xls,csv',
         ]);
 
         try {
@@ -110,7 +114,7 @@ class DonationController extends Controller
                 ->with('success', 'Donations imported successfully.');
         } catch (\Exception $e) {
             return redirect()->route('admin.donations.index')
-                ->with('error', 'Error importing donations: ' . $e->getMessage());
+                ->with('error', 'Error importing donations: '.$e->getMessage());
         }
     }
 
@@ -118,15 +122,16 @@ class DonationController extends Controller
     {
         try {
             $certificateUrl = $this->certificateService->generateAndUploadCertificate($donation);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Certificate generated successfully',
-                'certificate_url' => $certificateUrl
+                'certificate_url' => $certificateUrl,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to generate certificate: ' . $e->getMessage()
+                'message' => 'Failed to generate certificate: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -135,15 +140,16 @@ class DonationController extends Controller
     {
         try {
             $isValid = $this->certificateService->verifyCertificate($donation);
+
             return response()->json([
                 'success' => true,
                 'is_valid' => $isValid,
-                'message' => $isValid ? 'Certificate is valid' : 'Certificate is invalid or not accessible'
+                'message' => $isValid ? 'Certificate is valid' : 'Certificate is invalid or not accessible',
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to verify certificate: ' . $e->getMessage()
+                'message' => 'Failed to verify certificate: '.$e->getMessage(),
             ], 500);
         }
     }

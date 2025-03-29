@@ -3,10 +3,9 @@
 namespace App\Services;
 
 use App\Models\Donation;
-use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class CertificateService
 {
@@ -29,28 +28,30 @@ class CertificateService
 
             // Update donation with new certificate URL
             $donation->update([
-                'certificate_url' => $certificateUrl
+                'certificate_url' => $certificateUrl,
             ]);
 
             return $certificateUrl;
         } catch (\Exception $e) {
-            \Log::error('Certificate generation failed: ' . $e->getMessage());
+            Log::error('Certificate generation failed: '.$e->getMessage());
             throw $e;
         }
     }
 
     public function verifyCertificate(Donation $donation)
     {
-        if (!$donation->certificate_url) {
+        if (! $donation->certificate_url) {
             return false;
         }
 
         try {
             $filename = "certificates/{$donation->short_id}.pdf";
+
             return Storage::disk('s3')->exists($filename);
         } catch (\Exception $e) {
-            \Log::error('Certificate verification failed for donation ' . $donation->short_id . ': ' . $e->getMessage());
+            Log::error('Certificate verification failed for donation '.$donation->short_id.': '.$e->getMessage());
+
             return false;
         }
     }
-} 
+}
