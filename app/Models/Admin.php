@@ -40,6 +40,11 @@ class Admin extends Authenticatable
         return $this->activation_status === 'activated';
     }
 
+    public function isActive()
+    {
+        return $this->status === 'active';
+    }
+
     public function isPendingActivation()
     {
         return $this->activation_status === 'pending';

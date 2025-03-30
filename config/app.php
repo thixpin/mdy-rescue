@@ -123,4 +123,9 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+     * Package Service Providers...
+     */
+    Spatie\LaravelPdf\LaravelPdfServiceProvider::class,
+
 ];

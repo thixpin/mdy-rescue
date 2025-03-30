@@ -6,12 +6,28 @@
         <div class="flex justify-between items-center">
             <h2 class="text-xl font-semibold">Donation List</h2>
             <div class="flex gap-3">
-                <form action="{{ route('admin.donations.import') }}" method="POST" enctype="multipart/form-data" class="flex items-center">
+                <form action="{{ route('admin.donations.import') }}" method="POST" enctype="multipart/form-data" class="flex items-center" id="importForm">
                     @csrf
-                    <input type="file" name="file" accept=".xlsx,.xls,.csv" class="mr-2 border rounded px-3 py-2" required>
-                    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center">
-                        <i class="fas fa-file-import mr-2"></i>Import Excel
-                    </button>
+                    <div class="relative">
+                        <input type="file" 
+                               name="file" 
+                               accept=".xlsx,.xls,.csv" 
+                               class="hidden" 
+                               id="importFile"
+                               required>
+                        <label for="importFile" 
+                               class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center cursor-pointer transition-colors duration-200">
+                            <i class="fas fa-file-import mr-2" id="importIcon"></i>
+                            <span id="importButtonText">Import Excel</span>
+                            <div class="ml-2 hidden" id="importSpinner">
+                                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </div>
+                        </label>
+                        <div id="fileName" class="absolute top-0 left-0 w-full text-sm text-gray-500 mt-1"></div>
+                    </div>
                 </form>
                 <button onclick="document.getElementById('addDonationModal').classList.remove('hidden')" 
                     class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center">
@@ -24,7 +40,7 @@
     @if(session('success'))
         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
             <span class="block sm:inline">{{ session('success') }}</span>
-            <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.remove()" aria-label="Close">
                 <span class="sr-only">Close</span>
                 <i class="fas fa-times"></i>
             </button>
@@ -34,7 +50,7 @@
     @if(session('error'))
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
             <span class="block sm:inline">{{ session('error') }}</span>
-            <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.remove()" aria-label="Close">
                 <span class="sr-only">Close</span>
                 <i class="fas fa-times"></i>
             </button>
@@ -47,10 +63,11 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount in Text</th>
+                            <!-- <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount in Text</th> -->
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Donate Date</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Certificate</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Verified</th>
@@ -60,16 +77,24 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                         @foreach($donations as $donation)
                             <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">{{ $donation->short_id }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $donation->name }}</td>
                                 <td class="px-6 py-4">{{ Str::limit($donation->description, 50) }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ number_format($donation->donation_amount, 2) }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ $donation->amount_in_text }}</td>
+                                <!-- <td class="px-6 py-4 whitespace-nowrap">{{ $donation->amount_in_text }}</td> -->
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $donation->donate_date->format('Y-m-d') }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if($donation->certificate_url)
-                                        <a href="{{ $donation->certificate_url }}" target="_blank" class="text-blue-600 hover:text-blue-800" title="View Certificate">
-                                            <i class="fas fa-file-alt"></i>
-                                        </a>
+                                        <div class="flex items-center space-x-2">
+                                            <a href="{{ $donation->certificate_url }}" target="_blank" class="text-blue-600 hover:text-blue-800" title="View Certificate">
+                                                <i class="fas fa-file-alt"></i>
+                                            </a>
+                                            <button onclick="copyCertificateUrl('{{ $donation->certificate_url }}')" 
+                                                    class="text-gray-600 hover:text-gray-800" 
+                                                    title="Copy Certificate URL">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                        </div>
                                     @else
                                         <span class="text-gray-400" title="No Certificate">
                                             <i class="fas fa-file-alt"></i>
@@ -77,13 +102,14 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <form action="{{ route('admin.donations.toggle-verification', $donation) }}" method="POST" class="inline">
+                                    <form action="{{ route('admin.donations.toggle-verification', $donation) }}" method="POST" class="inline verification-form">
                                         @csrf
                                         <button type="submit" class="px-2 py-1 rounded {{ $donation->verified ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}" 
                                                 data-verified="{{ $donation->verified ? 'true' : 'false' }}"
                                                 data-donation-id="{{ $donation->short_id }}"
                                                 title="{{ $donation->verified ? 'Verified' : 'Not Verified' }}">
                                             <i class="fas {{ $donation->verified ? 'fa-check-circle' : 'fa-circle' }}"></i>
+                                            <i class="fas fa-spinner fa-spin hidden"></i>
                                         </button>
                                     </form>
                                 </td>
@@ -121,7 +147,7 @@
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="flex justify-between items-center mb-4">
                 <h5 class="text-lg font-medium">Add New Donation</h5>
-                <button type="button" class="text-gray-400 hover:text-gray-500" data-bs-dismiss="modal" aria-label="Close">
+                <button type="button" class="text-gray-400 hover:text-gray-500" onclick="document.getElementById('addDonationModal').classList.add('hidden')" aria-label="Close">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -150,7 +176,7 @@
                     </div>
                 </div>
                 <div class="mt-6 flex justify-end space-x-3">
-                    <button type="button" class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200" onclick="document.getElementById('addDonationModal').classList.add('hidden')">Cancel</button>
                     <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Add Donation</button>
                 </div>
             </form>
@@ -162,7 +188,7 @@
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="flex justify-between items-center mb-4">
                 <h5 class="text-lg font-medium">Edit Donation</h5>
-                <button type="button" class="text-gray-400 hover:text-gray-500" data-bs-dismiss="modal" aria-label="Close">
+                <button type="button" class="text-gray-400 hover:text-gray-500" onclick="document.getElementById('editDonationModal').classList.add('hidden')" aria-label="Close">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -196,23 +222,133 @@
                     </div>
                 </div>
                 <div class="mt-6 flex justify-end space-x-3">
-                    <button type="button" class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Update Donation</button>
+                    <button type="button" class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200" onclick="document.getElementById('editDonationModal').classList.add('hidden')">Cancel</button>
+                    <button type="submit" id="updateDonationBtn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center">
+                        <span class="mr-2">Update Donation</span>
+                        <i class="fas fa-spinner fa-spin hidden"></i>
+                    </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-full opacity-0 transition-all duration-300">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="toastMessage">Certificate URL copied to clipboard!</span>
         </div>
     </div>
 
     <script>
         let currentDonationId = null;
 
+        // Add file name display and auto-submit functionality
+        document.getElementById('importFile').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name;
+            const fileNameDisplay = document.getElementById('fileName');
+            const importButton = document.querySelector('label[for="importFile"]');
+            const importButtonText = document.getElementById('importButtonText');
+            const importSpinner = document.getElementById('importSpinner');
+            const importIcon = document.getElementById('importIcon');
+            const importForm = document.getElementById('importForm');
+
+            if (fileName) {
+                fileNameDisplay.textContent = `Selected: ${fileName}`;
+                fileNameDisplay.classList.remove('hidden');
+                
+                // Show loading state
+                importButton.classList.add('opacity-75', 'cursor-not-allowed');
+                importButtonText.textContent = 'Importing...';
+                importIcon.classList.add('hidden');
+                importSpinner.classList.remove('hidden');
+                
+                // Disable the button
+                importButton.style.pointerEvents = 'none';
+                
+                // Auto submit the form
+                importForm.submit();
+            } else {
+                fileNameDisplay.textContent = '';
+                fileNameDisplay.classList.add('hidden');
+                
+                // Reset button state
+                importButton.classList.remove('opacity-75', 'cursor-not-allowed');
+                importButtonText.textContent = 'Import Excel';
+                importIcon.classList.remove('hidden');
+                importSpinner.classList.add('hidden');
+                importButton.style.pointerEvents = 'auto';
+            }
+        });
+
+        // Add copy certificate URL function
+        function copyCertificateUrl(url) {
+            navigator.clipboard.writeText(url).then(() => {
+                // Show toast notification
+                const toast = document.getElementById('toast');
+                toast.classList.remove('translate-y-full', 'opacity-0');
+                
+                // Hide toast after 3 seconds
+                setTimeout(() => {
+                    toast.classList.add('translate-y-full', 'opacity-0');
+                }, 3000);
+            }).catch(err => {
+                console.error('Failed to copy URL:', err);
+                // Show error toast
+                const toast = document.getElementById('toast');
+                const toastMessage = document.getElementById('toastMessage');
+                toast.classList.remove('bg-green-500');
+                toast.classList.add('bg-red-500');
+                toastMessage.textContent = 'Failed to copy URL';
+                toast.classList.remove('translate-y-full', 'opacity-0');
+                
+                // Hide toast after 3 seconds
+                setTimeout(() => {
+                    toast.classList.add('translate-y-full', 'opacity-0');
+                    // Reset toast styling
+                    toast.classList.remove('bg-red-500');
+                    toast.classList.add('bg-green-500');
+                    toastMessage.textContent = 'Certificate URL copied to clipboard!';
+                }, 3000);
+            });
+        }
+
         // Initialize modals
         document.addEventListener('DOMContentLoaded', function() {
+            // Handle edit donation form submission
+            const editForm = document.getElementById('editDonationForm');
+            const updateBtn = document.getElementById('updateDonationBtn');
+            const updateBtnText = updateBtn.querySelector('span');
+            const updateBtnSpinner = updateBtn.querySelector('.fa-spinner');
+
+            editForm.addEventListener('submit', function(e) {
+                // Show loading state
+                updateBtn.disabled = true;
+                updateBtnText.textContent = 'Updating...';
+                updateBtnSpinner.classList.remove('hidden');
+            });
+
             // Handle edit donation
             document.querySelectorAll('.edit-donation-btn').forEach(button => {
                 button.addEventListener('click', function() {
                     const donationId = this.dataset.donationId;
                     editDonation(donationId);
+                });
+            });
+
+            // Handle verification form submission
+            document.querySelectorAll('.verification-form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    const button = this.querySelector('button');
+                    const checkIcon = button.querySelector('.fa-check-circle, .fa-circle');
+                    const spinner = button.querySelector('.fa-spinner');
+                    
+                    // Show spinner and hide check icon
+                    checkIcon.classList.add('hidden');
+                    spinner.classList.remove('hidden');
+                    
+                    // Disable the button
+                    button.disabled = true;
                 });
             });
         });

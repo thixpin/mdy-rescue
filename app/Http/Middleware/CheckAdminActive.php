@@ -15,7 +15,7 @@ class CheckAdminActive
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user('admin') || ! $request->user('admin')->isActivated()) {
+        if (! $request->user('admin') || ! $request->user('admin')->isActivated() || ! $request->user('admin')->isActive()) {
             return response()->view('admin.auth.waiting');
         }
 

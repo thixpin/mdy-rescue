@@ -14,7 +14,7 @@
                     Admin Login
                 </h2>
             </div>
-            <form class="mt-8 space-y-6" action="{{ route('admin.login') }}" method="POST">
+            <form class="mt-8 space-y-6" action="{{ route('login') }}" method="POST">
                 @csrf
                 <div class="rounded-md shadow-sm -space-y-px">
                     <div>
@@ -47,7 +47,7 @@
                 </div>
             </form>
             <div class="text-center">
-                <a href="{{ route('admin.register') }}" class="text-indigo-600 hover:text-indigo-500">
+                <a href="{{ route('register') }}" class="text-indigo-600 hover:text-indigo-500">
                     Don't have an account? Register
                 </a>
             </div>

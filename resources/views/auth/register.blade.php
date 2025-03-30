@@ -14,7 +14,7 @@
                     Create your account
                 </h2>
             </div>
-            <form class="mt-8 space-y-6" action="{{ route('admin.register') }}" method="POST">
+            <form class="mt-8 space-y-6" action="{{ route('register') }}" method="POST">
                 @csrf
                 <div class="rounded-md shadow-sm -space-y-px">
                     <div>
@@ -62,7 +62,7 @@
                 </div>
 
                 <div class="text-sm text-center">
-                    <a href="{{ route('admin.login') }}" class="font-medium text-indigo-600 hover:text-indigo-500">
+                    <a href="{{ route('login') }}" class="font-medium text-indigo-600 hover:text-indigo-500">
                         Already have an account? Sign in
                     </a>
                 </div>

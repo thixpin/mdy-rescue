@@ -65,6 +65,10 @@ class DonationController extends Controller
 
         $donation->update($validated);
 
+        if ($donation->verified) {
+            $this->certificateService->generateAndUploadCertificate($donation);
+        }
+
         return redirect()->route('admin.donations.index')
             ->with('success', 'Donation updated successfully.');
     }
@@ -80,7 +84,6 @@ class DonationController extends Controller
     public function toggleVerification(Donation $donation)
     {
         $newVerifiedStatus = ! $donation->verified;
-        $donation->update(['verified' => $newVerifiedStatus]);
 
         // Generate certificate when verifying
         if ($newVerifiedStatus) {
@@ -89,12 +92,18 @@ class DonationController extends Controller
 
                 return redirect()->route('admin.donations.index')
                     ->with('success', 'Donation verified and certificate generated successfully.');
+
             } catch (\Exception $e) {
-                Log::error('Failed to generate certificate for donation '.$donation->id.': '.$e->getMessage());
+                Log::error('Failed to generate certificate for donation '.$donation->short_id.': '.$e->getMessage());
 
                 return redirect()->route('admin.donations.index')
-                    ->with('error', 'Donation verified but failed to generate certificate: '.$e->getMessage());
+                    ->with('error', 'Failed to generate certificate for donation '.$donation->short_id);
             }
+        } else {
+            $donation->update([
+                'verified' => $newVerifiedStatus,
+                'certificate_url' => null,
+            ]);
         }
 
         return redirect()->route('admin.donations.index')

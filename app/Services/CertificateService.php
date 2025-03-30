@@ -2,10 +2,11 @@
 
 namespace App\Services;
 
+use App\Helpers\Formatter;
 use App\Models\Donation;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 class CertificateService
 {
@@ -13,15 +14,25 @@ class CertificateService
     {
         try {
             // Generate PDF certificate
-            $pdf = PDF::loadView('certificates.donation', [
-                'donation' => $donation,
-            ]);
+            $donationCopy = $donation->replicate();
+            $donationCopy->name = $donationCopy->name;
+            $donationCopy->description = $donationCopy->description;
+            $donationCopy->amount = Formatter::myanmarCurrency($donationCopy->donation_amount);
+            $donationCopy->amount_in_text = $donationCopy->amount_in_text.'တိတိ';
+            $donationCopy->formated_date = Formatter::convertToMmNumber($donationCopy->donate_date->format('d  m  Y'));
+
+            $pdf = Pdf::view('certificates.donation', [
+                'donation' => $donationCopy,
+            ])
+                ->format('A4')
+                ->orientation('portrait')
+                ->margins(0, 0, 0, 0);
 
             // Generate unique filename
             $filename = "certificates/{$donation->short_id}.pdf";
 
             // Upload to S3
-            Storage::disk('s3')->put($filename, $pdf->output());
+            $pdf->disk('s3')->save($filename);
 
             // Get the public URL
             $certificateUrl = Storage::disk('s3')->url($filename);
@@ -29,6 +40,7 @@ class CertificateService
             // Update donation with new certificate URL
             $donation->update([
                 'certificate_url' => $certificateUrl,
+                'verified' => true,
             ]);
 
             return $certificateUrl;
