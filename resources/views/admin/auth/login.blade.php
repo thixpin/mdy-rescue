@@ -14,7 +14,7 @@
                     Admin Login
                 </h2>
             </div>
-            <form class="mt-8 space-y-6" action="{{ route('login') }}" method="POST">
+            <form class="mt-8 space-y-6" action="{{ route('admin.login') }}" method="POST">
                 @csrf
                 <div class="rounded-md shadow-sm -space-y-px">
                     <div>

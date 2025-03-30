@@ -37,7 +37,7 @@ class AuthController extends Controller
 
         Auth::guard('admin')->login($admin);
 
-        return redirect()->intended('/admin/dashboard');
+        return redirect()->intended('/admin');
     }
 
     public function login(Request $request)
@@ -50,7 +50,7 @@ class AuthController extends Controller
         if (Auth::guard('admin')->attempt($credentials)) {
             $request->session()->regenerate();
 
-            return redirect()->intended('/admin/dashboard');
+            return redirect()->intended('/admin');
         }
 
         throw ValidationException::withMessages([

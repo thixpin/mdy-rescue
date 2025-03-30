@@ -59,7 +59,7 @@
                 </div>
             </form>
             <div class="text-center">
-                <a href="{{ route('login') }}" class="text-indigo-600 hover:text-indigo-500">
+                <a href="{{ route('admin.login') }}" class="text-indigo-600 hover:text-indigo-500">
                     Already have an account? Login
                 </a>
             </div>
