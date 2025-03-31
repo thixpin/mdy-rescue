@@ -16,13 +16,19 @@ class Donation extends Model
         'donation_amount',
         'amount_in_text',
         'donate_date',
-        'verified',
         'certificate_url',
+        'verified',
+        'donation_target_id',
     ];
 
     protected $casts = [
-        'donate_date' => 'datetime',
-        'verified' => 'boolean',
         'donation_amount' => 'decimal:2',
+        'donate_date' => 'date',
+        'verified' => 'boolean',
     ];
+
+    public function donationTarget()
+    {
+        return $this->belongsTo(DonationTarget::class);
+    }
 }
