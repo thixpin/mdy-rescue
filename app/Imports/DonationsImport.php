@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use App\Enums\Currency;
 use App\Models\Donation;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\ToModel;
@@ -30,10 +31,11 @@ class DonationsImport implements ToModel, WithHeadingRow, WithValidation
                 'name' => $row['name'],
                 'description' => $row['description'] ?? null,
                 'donation_amount' => $row['donation_amount'],
+                'currency' => $row['currency'] ?? 'MMK',
                 'amount_in_text' => $row['amount_in_text'],
                 'donate_date' => $date->format('Y-m-d H:i:s'),
                 'verified' => false,
-                'certificate_url' => $row['certificate_url'] ?? null,
+                // 'certificate_url' => $row['certificate_url'] ?? null,
             ]);
         } catch (\Exception $e) {
             throw new \Exception('Error processing row: '.json_encode($row).'. Error: '.$e->getMessage());
@@ -44,6 +46,7 @@ class DonationsImport implements ToModel, WithHeadingRow, WithValidation
     {
         return [
             'name' => 'required|string|max:255',
+            'currency' => ['required', 'string', 'in:'.implode(',', Currency::values())],
             'donation_amount' => 'required|numeric|min:0',
             'amount_in_text' => 'required|string',
             'donate_date' => 'required',
@@ -61,6 +64,8 @@ class DonationsImport implements ToModel, WithHeadingRow, WithValidation
             'amount_in_text.required' => 'The amount in text field is required.',
             'donate_date.required' => 'The donate date field is required.',
             'certificate_url.url' => 'The certificate URL must be a valid URL.',
+            // 'currency.string' => 'The currency must be a string.',
+            // 'currency.in' => 'The currency must be one of the following: '.implode(', ', Currency::values()),
         ];
     }
 }
