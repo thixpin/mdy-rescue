@@ -98,6 +98,7 @@
             text-align: center;
             font-size: 9pt;
             color: #666;
+            display: none;
         }
         .verification-code a {
             color: #444;
