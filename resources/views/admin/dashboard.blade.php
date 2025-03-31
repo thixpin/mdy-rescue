@@ -73,7 +73,13 @@
                         </div>
                         <div class="ml-4">
                             <h3 class="text-sm font-medium text-gray-500">Total Verified Amount</h3>
-                            <p class="text-2xl font-semibold text-gray-900">MMK {{ number_format($totalVerifiedAmount, 2) }}</p>
+                            <div class="space-y-1">
+                                @foreach($totalVerifiedAmounts as $amount)
+                                    <p class="text-lg font-semibold text-gray-900">
+                                        {{ $amount['formatted'] }}
+                                    </p>
+                                @endforeach
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -119,10 +125,10 @@
                                     <div class="flex items-center space-x-4">
                                         <div class="flex-1 min-w-0">
                                             <p class="text-sm font-medium text-gray-900 truncate">
-                                                {{ $donation->donor_name }}
+                                                {{ $donation->name }}
                                             </p>
                                             <p class="text-sm text-gray-500">
-                                                MMK {{ number_format($donation->donation_amount, 2) }}
+                                                {{ $donation->formatted_amount }}
                                             </p>
                                         </div>
                                         <div>
@@ -156,11 +162,16 @@
                             </div>
                         </div>
 
-                        <!-- Average Donation -->
+                        <!-- Average Donation by Currency -->
                         <div>
-                            <div class="flex justify-between text-sm text-gray-500">
-                                <span>Average Donation Amount</span>
-                                <span>MMK {{ number_format($averageDonationAmount, 2) }}</span>
+                            <h3 class="text-sm font-medium text-gray-500 mb-2">Average Donation Amount</h3>
+                            <div class="space-y-2">
+                                @foreach($averageDonationAmounts as $amount)
+                                    <div class="flex justify-between text-sm text-gray-500">
+                                        <span>{{ $amount['label'] }}</span>
+                                        <span>{{ $amount['formatted'] }}</span>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
                     </div>

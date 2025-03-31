@@ -23,11 +23,33 @@ class AdminDashboardController extends Controller
             ? round(($verifiedDonations / $totalDonations) * 100, 1)
             : 0;
 
-        // Get total verified amount
-        $totalVerifiedAmount = Donation::where('verified', true)->sum('donation_amount');
+        // Get total verified amounts by currency
+        $totalVerifiedAmounts = Donation::where('verified', true)
+            ->selectRaw('currency, SUM(donation_amount) as total')
+            ->groupBy('currency')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'currency' => $item->currency,
+                    'amount' => $item->total,
+                    'formatted' => $item->currency->format($item->total),
+                    'label' => $item->currency->label(),
+                ];
+            });
 
-        // Get average donation amount
-        $averageDonationAmount = Donation::where('verified', true)->avg('donation_amount');
+        // Get average donation amounts by currency
+        $averageDonationAmounts = Donation::where('verified', true)
+            ->selectRaw('currency, AVG(donation_amount) as average')
+            ->groupBy('currency')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'currency' => $item->currency,
+                    'amount' => $item->average,
+                    'formatted' => $item->currency->format($item->average),
+                    'label' => $item->currency->label(),
+                ];
+            });
 
         // Get recent donations
         $recentDonations = Donation::latest()->take(5)->get();
@@ -37,8 +59,8 @@ class AdminDashboardController extends Controller
             'verifiedDonations',
             'pendingVerifications',
             'verificationRate',
-            'totalVerifiedAmount',
-            'averageDonationAmount',
+            'totalVerifiedAmounts',
+            'averageDonationAmounts',
             'recentDonations'
         ));
     }

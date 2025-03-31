@@ -22,7 +22,14 @@ class DonationController extends Controller
 
     public function index()
     {
-        $donations = Donation::latest()->paginate(10);
+        $query = Donation::latest();
+
+        // Apply verified filter if specified
+        if (request()->has('verified')) {
+            $query->where('verified', request()->boolean('verified'));
+        }
+
+        $donations = $query->paginate(10);
         $currencies = Currency::options();
 
         return view('admin.donations.index', compact('donations', 'currencies'));
