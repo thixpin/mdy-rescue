@@ -17,8 +17,10 @@ class CertificateService
             $donationCopy = $donation->replicate();
             $donationCopy->name = $donationCopy->name;
             $donationCopy->description = $donationCopy->description;
-            $donationCopy->amount = Formatter::myanmarCurrency($donationCopy->donation_amount);
-            $donationCopy->amount_in_text = $donationCopy->amount_in_text.'တိတိ';
+            $donationCopy->amount = $donationCopy->formatted_amount;
+            $donationCopy->amount_in_text = ($donationCopy->currency->value == 'MMK' && $donationCopy->amount_in_text != '') ?
+                            $donationCopy->amount_in_text.'တိတိ' :
+                            $donationCopy->amount_in_text;
             $donationCopy->formated_date = Formatter::convertToMmNumber($donationCopy->donate_date->format('d  m  Y'));
 
             $pdf = Pdf::view('certificates.donation', [

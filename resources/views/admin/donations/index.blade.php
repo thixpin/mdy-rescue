@@ -67,7 +67,6 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                            <!-- <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount in Text</th> -->
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Donate Date</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Certificate</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Verified</th>
@@ -80,8 +79,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $donation->short_id }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $donation->name }}</td>
                                 <td class="px-6 py-4">{{ Str::limit($donation->description, 50) }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ number_format($donation->donation_amount, 2) }}</td>
-                                <!-- <td class="px-6 py-4 whitespace-nowrap">{{ $donation->amount_in_text }}</td> -->
+                                <td class="px-6 py-4 whitespace-nowrap">{{ $donation->formatted_amount }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $donation->donate_date->format('Y-m-d') }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if($donation->certificate_url)
@@ -163,6 +161,14 @@
                         <textarea name="description" id="description" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
                     </div>
                     <div>
+                        <label class="block text-sm font-medium text-gray-700" for="currency">Currency</label>
+                        <select name="currency" id="currency" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            @foreach($currencies as $value => $label)
+                                <option value="{{ $value }}">{{ $value }} ({{ $label }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
                         <label class="block text-sm font-medium text-gray-700" for="donation_amount">Donation Amount</label>
                         <input type="number" step="0.01" name="donation_amount" id="donation_amount" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     </div>
@@ -203,6 +209,14 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700" for="edit_description">Description</label>
                         <textarea name="description" id="edit_description" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700" for="edit_currency">Currency</label>
+                        <select name="currency" id="edit_currency" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            @foreach($currencies as $value => $label)
+                                <option value="{{ $value }}">{{ $value }} ({{ $label }})</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700" for="edit_donation_amount">Donation Amount</label>
@@ -380,6 +394,7 @@
                 document.getElementById('edit_name').value = donation.name;
                 document.getElementById('edit_description').value = donation.description || '';
                 document.getElementById('edit_donation_amount').value = donation.donation_amount;
+                document.getElementById('edit_currency').value = donation.currency;
                 document.getElementById('edit_amount_in_text').value = donation.amount_in_text;
                 document.getElementById('edit_certificate_url').value = donation.certificate_url || '';
                 
