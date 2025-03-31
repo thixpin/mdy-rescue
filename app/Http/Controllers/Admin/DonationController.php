@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\Currency;
 use App\Http\Controllers\Controller;
 use App\Imports\DonationsImport;
 use App\Models\Donation;
@@ -22,8 +23,9 @@ class DonationController extends Controller
     public function index()
     {
         $donations = Donation::latest()->paginate(10);
+        $currencies = Currency::options();
 
-        return view('admin.donations.index', compact('donations'));
+        return view('admin.donations.index', compact('donations', 'currencies'));
     }
 
     public function store(Request $request)
@@ -32,6 +34,7 @@ class DonationController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'donation_amount' => 'required|numeric|min:0',
+            'currency' => ['required', 'string', 'in:'.implode(',', Currency::values())],
             'amount_in_text' => 'required|string',
             'donate_date' => 'required|date',
             'verified' => 'boolean',
@@ -58,6 +61,7 @@ class DonationController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'donation_amount' => 'required|numeric|min:0',
+            'currency' => ['required', 'string', 'in:'.implode(',', Currency::values())],
             'amount_in_text' => 'required|string',
             'donate_date' => 'required|date',
             'verified' => 'boolean',
