@@ -17,9 +17,11 @@ class CertificateService
             $donationCopy = $donation->replicate();
             $donationCopy->name = $donationCopy->name;
             $donationCopy->description = $donationCopy->description;
-            $donationCopy->amount = $donationCopy->formatted_amount;
+            $donationCopy->amount = ($donationCopy->currency->value == 'MMK') ?
+                            'အလှူတော်ငွေ ( '.$donationCopy->formatted_amount.' ) ကျပ်' :
+                            $donationCopy->formatted_amount;
             $donationCopy->amount_in_text = ($donationCopy->currency->value == 'MMK' && $donationCopy->amount_in_text != '') ?
-                            $donationCopy->amount_in_text.'တိတိ' :
+                            $donationCopy->amount_in_text.' တိတိ' :
                             $donationCopy->amount_in_text;
             $donationCopy->formated_date = Formatter::convertToMmNumber($donationCopy->donate_date->format('d  m  Y'));
 

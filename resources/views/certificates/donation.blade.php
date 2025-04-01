@@ -16,6 +16,13 @@
             font-weight: bold;
             font-style: normal;
         }
+        @font-face {
+            font-family: 'Myanmar Square';
+            src: url("{!! public_path('assets/fonts/MyanmarSquare.ttf') !!}") format("truetype");
+            font-weight: normal;
+            font-style: normal;
+        }
+        
         body {
             font-family: 'Pyidaungsu', Arial, sans-serif;
             margin: 0;
@@ -48,7 +55,7 @@
         }
         .content {
             position: absolute;
-            top: 112mm; /* Adjust this value to position content correctly */
+            top: 110mm; /* Adjust this value to position content correctly */
             left: 10mm;
             right: 10mm;
             font-size: 16pt;
@@ -64,21 +71,22 @@
         }
         .date {
             position: absolute;
-            top: -2mm;
-            left: 131mm;
+            top: 0;
+            left: 130.5mm;
             right: 0mm;
             text-align: left;
+            font-family: 'Myanmar Square', Arial, sans-serif;
         }
         .name {
             position: absolute;
-            top: 8mm;
+            top: 7mm;
             font-weight: bold;
             font-size: 24pt;
         }
 
         .description {
             position: absolute;
-            top: 23mm;
+            top: 23.5mm;
         }
         .amount {
             position: absolute;
@@ -117,7 +125,7 @@
             <p class="date input-txt">{{ $donation->formated_date }} </p>
             <p class="name input-txt">{{ $donation->name }}</p>
             @if($donation->description)
-                <p class="description input-txt">({{ $donation->description }})</p>
+                <p class="description input-txt">{{ $donation->description }}</p>
             @endif
             <p class="amount input-txt">{{ $donation->amount }}
             <p class="amount-text input-txt">{{ $donation->amount_in_text }} </p>

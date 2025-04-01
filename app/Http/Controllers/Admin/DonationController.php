@@ -42,7 +42,7 @@ class DonationController extends Controller
             'description' => 'nullable|string',
             'donation_amount' => 'required|numeric|min:0',
             'currency' => ['required', 'string', 'in:'.implode(',', Currency::values())],
-            'amount_in_text' => 'required|string',
+            'amount_in_text' => 'nullable|string',
             'donate_date' => 'required|date',
             'verified' => 'boolean',
         ]);
@@ -69,7 +69,7 @@ class DonationController extends Controller
             'description' => 'nullable|string',
             'donation_amount' => 'required|numeric|min:0',
             'currency' => ['required', 'string', 'in:'.implode(',', Currency::values())],
-            'amount_in_text' => 'required|string',
+            'amount_in_text' => 'nullable|string',
             'donate_date' => 'required|date',
             'verified' => 'boolean',
         ]);

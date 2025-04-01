@@ -44,7 +44,7 @@ enum Currency: string
     public function format(float $amount): string
     {
         return $this->value === 'MMK' ?
-            'ငွေကျပ်'.' '.self::toMyanmarNumber($amount, 2).'/-' :
+            self::toMyanmarNumber($amount).'/-' :
             $this->value.' '.number_format($amount, 2).' '.$this->symbol();
     }
 
@@ -63,7 +63,7 @@ enum Currency: string
             '9' => '၉',
         ];
 
-        return str_replace(array_keys($mmNumbers), $mmNumbers, $amount);
+        return str_replace(array_keys($mmNumbers), $mmNumbers, number_format($amount, 0));
 
     }
 }

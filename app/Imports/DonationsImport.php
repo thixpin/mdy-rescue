@@ -48,7 +48,7 @@ class DonationsImport implements ToModel, WithHeadingRow, WithValidation
             'name' => 'required|string|max:255',
             'currency' => ['required', 'string', 'in:'.implode(',', Currency::values())],
             'donation_amount' => 'required|numeric|min:0',
-            'amount_in_text' => 'required|string',
+            'amount_in_text' => 'nullable|string',
             'donate_date' => 'required',
             'certificate_url' => 'nullable|url',
         ];
@@ -61,7 +61,6 @@ class DonationsImport implements ToModel, WithHeadingRow, WithValidation
             'donation_amount.required' => 'The donation amount field is required.',
             'donation_amount.numeric' => 'The donation amount must be a number.',
             'donation_amount.min' => 'The donation amount must be greater than 0.',
-            'amount_in_text.required' => 'The amount in text field is required.',
             'donate_date.required' => 'The donate date field is required.',
             'certificate_url.url' => 'The certificate URL must be a valid URL.',
             // 'currency.string' => 'The currency must be a string.',

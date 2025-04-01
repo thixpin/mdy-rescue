@@ -174,7 +174,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700" for="amount_in_text">Amount in Text</label>
-                        <input type="text" name="amount_in_text" id="amount_in_text" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <input type="text" name="amount_in_text" id="amount_in_text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700" for="donate_date">Donate Date</label>
@@ -224,7 +224,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700" for="edit_amount_in_text">Amount in Text</label>
-                        <input type="text" name="amount_in_text" id="edit_amount_in_text" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <input type="text" name="amount_in_text" id="edit_amount_in_text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700" for="edit_donate_date">Donate Date</label>
